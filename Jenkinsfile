@@ -1,28 +1,45 @@
 pipeline {
     agent any
+    environment {
+        PYTHON_PATH = 'C:\Program Files\Python313;C:\Program Files\Python313\Scripts'
+    }
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Build') {
             steps {
-                echo "I am building"
+                bat '''
+                set PATH=%PYTHON_PATH%;%PATH%
+                pip install -r requirements.txt
+                '''
             }
         }
-        stage('Test') {
-            steps {
-                echo "I am testing"
+
+        stage('SonarQube Analysis') {
+            environment {
+                SONAR_TOKEN = credentials('sonarqube-token')  // Retrieve SonarQube token from Jenkins credentials
             }
-        }
-        stage('Deploy') {
             steps {
-                echo "Deploying"
+                bat '''
+                set PATH=%PYTHON_PATH%;%PATH%
+                sonar-scanner.bat -Dsonar.projectKey=sonartest101 ^
+                                  -Dsonar.sources=. ^
+                                  -Dsonar. host.url=http://localhost:9000 ^
+                                  -Dsonar.token=%SONAR_TOKEN%
+                '''
             }
         }
     }
     post {
         success {
-            echo 'Your pipeline is successful'
+            echo "Went well and good"
         }
         failure {
-            echo 'Pipeline failed'
+            echo "Pipeline failed"
         }
     }
 }
