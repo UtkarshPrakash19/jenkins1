@@ -26,12 +26,7 @@ pipeline {
                 }
             }
         }
-        stage('SonarAnalysis') {
-            when {
-                expression {
-                    currentBuild.result == null // Run only if no errors so far
-                }
-            }
+        stage('SonarQube Analysis') {
             environment {
                 // Sonar token retrieved securely using Jenkins credentials
                 SONAR_TOKEN = credentials('sonar-token')
@@ -41,9 +36,9 @@ pipeline {
                 bat '''
                 set PATH=%PYTHON_PATH%;%PATH%
                 sonar-scanner -Dsonar.projectKey=sonartest101 ^
-                              -Dsonar.sources=. ^
+                              -Dsonar.sources=./factorial.py ^
                               -Dsonar.host.url=http://localhost:9000 ^
-                              -Dsonar.token=sqp_4ce1b003bba5b39a95b0e2d9ffd80d8256a24667
+                              -Dsonar.token=%SONAR_TOKEN%
                 '''
             }
         }
