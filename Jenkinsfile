@@ -34,7 +34,7 @@ pipeline {
             }
             environment {
                 // Sonar token retrieved securely using Jenkins credentials
-                SONAR_TOKEN = credentials('sonarqube-token')
+                SONAR_TOKEN = credentials('sonar-token')
             }
             steps {
                 echo 'Running SonarQube analysis...'
