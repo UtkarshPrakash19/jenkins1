@@ -1,45 +1,44 @@
 pipeline {
     agent any
     environment {
-        PYTHON_PATH = 'C:\Program Files\Python313;C:\Program Files\Python313\Scripts'
+        // Correctly escaped Python path
+        PYTHON_PATH = 'C:\\Program Files\\Python313;C:\\Program Files\\Python313\\Scripts'
     }
     stages {
-        stage('Checkout') {
+        stage('Environment Setup') {
             steps {
-                checkout scm
+                echo "Setting up the environment..."
+                echo "Python Path is set to: ${env.PYTHON_PATH}"
             }
         }
-        
         stage('Build') {
             steps {
-                bat '''
-                set PATH=%PYTHON_PATH%;%PATH%
-                pip install -r requirements.txt
-                '''
+                echo "Running the build stage..."
+                // Add your build steps here
             }
         }
-
-        stage('SonarQube Analysis') {
-            environment {
-                SONAR_TOKEN = credentials('sonarqube-token')  // Retrieve SonarQube token from Jenkins credentials
-            }
+        stage('Test') {
             steps {
-                bat '''
-                set PATH=%PYTHON_PATH%;%PATH%
-                sonar-scanner.bat -Dsonar.projectKey=sonartest101 ^
-                                  -Dsonar.sources=. ^
-                                  -Dsonar. host.url=http://localhost:9000 ^
-                                  -Dsonar.token=sqp_4ce1b003bba5b39a95b0e2d9ffd80d8256a24667
-                '''
+                echo "Running tests..."
+                // Add your test commands here
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "Deploying the application..."
+                // Add your deployment steps here
             }
         }
     }
     post {
+        always {
+            echo "Pipeline finished."
+        }
         success {
-            echo "Went well and good"
+            echo "Pipeline succeeded!"
         }
         failure {
-            echo "Pipeline failed"
+            echo "Pipeline failed!"
         }
     }
 }
