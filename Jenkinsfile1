@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+    stages {
+        stage('Print Table of 20') {
+            steps {
+                script {
+                    // Printing the table of 20
+                    for (int i = 1; i <= 10; i++) {
+                        echo "20 x ${i} = ${20 * i}"
+                    }
+                }
+            }
+        }
+    }
+}
