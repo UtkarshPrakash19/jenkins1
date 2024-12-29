@@ -1,44 +1,62 @@
 pipeline {
     agent any
     environment {
-        // Correctly escaped Python path
+        // Properly escaped Python path
         PYTHON_PATH = 'C:\\Program Files\\Python313;C:\\Program Files\\Python313\\Scripts'
     }
     stages {
-        stage('Environment Setup') {
+        stage('Checkout') {
             steps {
-                echo "Setting up the environment..."
-                echo "Python Path is set to: ${env.PYTHON_PATH}"
+                echo 'Checking out source code...'
+                checkout scm
             }
         }
         stage('Build') {
             steps {
-                echo "Running the build stage..."
-                // Add your build steps here
+                script {
+                    echo 'Starting the Build Stage...'
+                    if (fileExists('requirements.txt')) {
+                        bat '''
+                        set PATH=%PYTHON_PATH%;%PATH%
+                        pip install -r requirements.txt
+                        '''
+                    } else {
+                        error "requirements.txt not found in the workspace."
+                    }
+                }
             }
         }
-        stage('Test') {
-            steps {
-                echo "Running tests..."
-                // Add your test commands here
+        stage('SonarAnalysis') {
+            when {
+                expression {
+                    currentBuild.result == null // Run only if no errors so far
+                }
             }
-        }
-        stage('Deploy') {
+            environment {
+                // Sonar token retrieved securely using Jenkins credentials
+                SONAR_TOKEN = credentials('sonarqube-token')
+            }
             steps {
-                echo "Deploying the application..."
-                // Add your deployment steps here
+                echo 'Running SonarQube analysis...'
+                bat '''
+                set PATH=%PYTHON_PATH%;%PATH%
+                sonar-scanner -Dsonar.projectKey=sonartest101 ^
+                              -Dsonar.sources=. ^
+                              -Dsonar.host.url=http://localhost:9000 ^
+                              -Dsonar.token=%SONAR_TOKEN%
+                '''
             }
         }
     }
     post {
         always {
-            echo "Pipeline finished."
+            echo 'Pipeline execution completed.'
         }
         success {
-            echo "Pipeline succeeded!"
+            echo 'Pipeline completed successfully.'
         }
         failure {
-            echo "Pipeline failed!"
+            echo 'Pipeline failed.'
         }
     }
 }
