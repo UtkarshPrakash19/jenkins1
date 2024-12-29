@@ -43,7 +43,7 @@ pipeline {
                 sonar-scanner -Dsonar.projectKey=sonartest101 ^
                               -Dsonar.sources=. ^
                               -Dsonar.host.url=http://localhost:9000 ^
-                              -Dsonar.token=%SONAR_TOKEN%
+                              -Dsonar.token=sqp_4ce1b003bba5b39a95b0e2d9ffd80d8256a24667
                 '''
             }
         }
