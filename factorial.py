@@ -10,4 +10,4 @@ num = int(input("Enter a number: "))
 # Calculating the factorial
 result = factorial(num)
 
-print(f"The factorial of {num} is =  {result}.")
+print(f"The factorial of {num} is =  {result}..")
